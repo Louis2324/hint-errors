@@ -128,6 +128,12 @@ If you're on Node 18+, make sure you're not in a context where it's unavailable.
 Otherwise, install a polyfill like node-fetch: npm install node-fetch.`,
   },
   {
+    match: "require is not defined",
+    hint: `You're using require() inside an ES module.
+Your package.json likely has "type": "module" set.
+Either switch to import syntax, or rename the file to .cjs.`,
+  },
+  {
     match: "is not defined",
     hint: `You're using a variable or function that hasn't been declared yet.
 Check for typos in the name, make sure it's in scope, and that the
@@ -163,12 +169,6 @@ or a keyword used in the wrong place.`,
     hint: `You're using ES module syntax (import/export) but Node is treating your file as CommonJS.
 Either rename the file to .mjs, add "type": "module" to your package.json,
 or switch to CommonJS syntax: const x = require('x').`,
-  },
-  {
-    match: "require is not defined",
-    hint: `You're using require() inside an ES module.
-Your package.json likely has "type": "module" set.
-Either switch to import syntax, or rename the file to .cjs.`,
   },
 
   // ─── RangeErrors ───────────────────────────────────────────────
@@ -277,7 +277,7 @@ This usually means you're trying to listen on a specific IP that doesn't exist o
 Try using 0.0.0.0 or localhost instead.`,
   },
   {
-    match: "MODULE_NOT_FOUND",
+    match: /MODULE_NOT_FOUND|Cannot find module/,
     hint: `Node can't find the module you're trying to import.
 Check that the package is installed (npm install <package>), the name is spelled
 correctly, and the file path is right if it's a local module.`,

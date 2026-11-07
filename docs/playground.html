@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Try it yourself — hint-errors</title>
+    <meta
+      name="description"
+      content="Explore hint-errors in an interactive Node.js error playground."
+    />
+    <meta name="theme-color" content="#1e1e1c" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        var saved = localStorage.getItem("hint-errors-theme");
+        var theme =
+          saved ||
+          (window.matchMedia("(prefers-color-scheme: light)").matches
+            ? "light"
+            : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
+  </head>
+  <body class="playground-page">
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="topnav">
+      <a class="brand" href="index.html#top">
+        <img class="brand-mark" src="assets/logo-mark.svg" alt="" width="32" height="32" />
+        <span class="mono">hint<span class="dot">-</span>errors</span>
+        <span class="version">v1.3.0</span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html#getting-started">Getting Started</a>
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="index.html#api">API</a>
+        <a href="index.html#errors">Errors</a>
+        <a
+          class="gh"
+          href="https://github.com/Louis2324/hint-errors"
+          target="_blank"
+          rel="noopener"
+          >GitHub</a
+        >
+      </nav>
+
+      <div class="nav-controls">
+        <button
+          class="theme-toggle"
+          id="themeToggle"
+          aria-label="Toggle color theme"
+        >
+          <svg class="moon" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M17.3 12.9a7.4 7.4 0 0 1-9.2-9.2 7.4 7.4 0 1 0 9.2 9.2Z" />
+          </svg>
+          <svg class="sun" viewBox="0 0 20 20" fill="currentColor">
+            <circle cx="10" cy="10" r="3.6" />
+            <path
+              d="M10 2v2M10 16v2M18 10h-2M4 10H2M15.5 4.5l-1.4 1.4M5.9 14.1l-1.4 1.4M15.5 15.5l-1.4-1.4M5.9 5.9 4.5 4.5"
+              stroke="currentColor"
+              stroke-width="1.4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" class="playground-main">
+      <div class="playground-breadcrumb">
+        <a href="index.html#errors">← Error Gallery</a>
+        <span>/</span>
+        <span>Interactive Playground</span>
+      </div>
+
+      <section class="playground-hero" aria-labelledby="playground-title">
+        <p class="hero-kicker">interactive playground</p>
+        <h1 id="playground-title">Try it yourself.</h1>
+        <p class="playground-lede">
+          Edit a small Node.js failure, run the safe browser simulation, and
+          see the plain-English hint that hint-errors would print.
+        </p>
+      </section>
+
+      <section class="playground playground-page-card" aria-label="Interactive error playground">
+        <div class="playground-toolbar">
+          <div class="playground-heading">
+            <p class="playground-kicker">choose a challenge</p>
+            <p class="playground-copy">
+              Start with a real error pattern, then change the code and run it
+              again.
+            </p>
+          </div>
+          <div class="playground-actions">
+            <label class="pg-select-label" for="pgScenario">Example</label>
+            <select id="pgScenario" class="pg-scenario"></select>
+            <button class="pg-btn" id="pgReset" type="button">Reset</button>
+            <button class="pg-btn pg-btn-primary" id="pgRun" type="button">
+              Run example
+            </button>
+          </div>
+        </div>
+
+        <div class="pg-workbench">
+          <section class="pg-panel pg-editor-panel" aria-labelledby="pgEditorTitle">
+            <div class="pg-panel-titlebar">
+              <span id="pgEditorTitle" class="pg-panel-title">example.js</span>
+              <span class="pg-panel-meta">editable</span>
+            </div>
+            <div class="pg-editor-shell">
+              <pre class="pg-line-numbers" id="pgLineNumbers" aria-hidden="true">1</pre>
+              <textarea
+                id="pgCode"
+                class="pg-code"
+                aria-label="Editable Node.js example"
+                spellcheck="false"
+                wrap="off"
+              ></textarea>
+            </div>
+          </section>
+
+          <div class="pg-output-stack" aria-label="Program output comparison">
+            <section class="pg-panel pg-output-panel" aria-labelledby="pgRawOutputTitle">
+              <div class="pg-panel-titlebar">
+                <span id="pgRawOutputTitle" class="pg-panel-title">raw Node.js output</span>
+                <span class="pg-panel-meta">before hint-errors</span>
+              </div>
+              <pre class="pg-raw-result" id="pgRawResult" aria-live="polite"></pre>
+            </section>
+
+            <section class="pg-panel pg-output-panel" aria-labelledby="pgOutputTitle">
+              <div class="pg-panel-titlebar">
+                <span id="pgOutputTitle" class="pg-panel-title">hint-errors output</span>
+                <span class="pg-panel-meta" id="pgStatus" aria-live="polite">Ready</span>
+              </div>
+              <div class="pg-result" id="pgResult" aria-live="polite"></div>
+            </section>
+          </div>
+        </div>
+
+        <p class="pg-note">
+          Safe browser simulation: this example does not execute arbitrary
+          Node.js or access your filesystem or network.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer playground-footer">
+      <div class="footer-row">
+        <div class="footer-links">
+          <a href="index.html">Docs</a>
+          <a href="https://www.npmjs.com/package/hint-errors" target="_blank" rel="noopener">npm</a>
+          <a href="https://github.com/Louis2324/hint-errors" target="_blank" rel="noopener">GitHub</a>
+        </div>
+        <p class="footer-meta">safe simulation · no runtime dependencies</p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

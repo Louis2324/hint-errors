@@ -1057,16 +1057,17 @@ before retrying checkout.`,
               No matching entries. Try a different search term.
             </p>
 
-            <h3 class="sub-head">Try it</h3>
-            <div class="playground">
-              <label for="pgInput">Paste an error message</label>
-              <textarea
-                id="pgInput"
-                placeholder="e.g. Cannot read properties of undefined (reading 'id')"
-              >
-Cannot read properties of undefined (reading 'id')</textarea
-              >
-              <div class="pg-result" id="pgResult"></div>
+            <div class="playground-cta">
+              <div>
+                <p class="playground-kicker">Want to see it in action?</p>
+                <p class="playground-copy">
+                  Try a failure in the interactive playground and edit the
+                  example to see how the hint changes.
+                </p>
+              </div>
+              <a class="btn btn-primary" href="playground.html">
+                Try it yourself <span aria-hidden="true">→</span>
+              </a>
             </div>
             <!-- This widget reads from the same HINTS_DATA array as the gallery
            above. If src/hints.js changes, HINTS_DATA in app.js must be
@@ -1199,11 +1200,13 @@ Cannot read properties of undefined (reading 'id')</textarea
                     <path d="M10 8.5v3.5M10 14.5h.01" /></svg
                 ></span>
                 <div>
-                  <strong>No published web playground</strong>
+                  <strong>No live Node.js execution</strong>
                   <span class="detail"
-                    >The "try it" widget on this page runs against a small
-                    mirrored dataset in the browser, not a live Node process. A
-                    real hosted playground is planned for a future phase.</span
+                    >The interactive playground runs against a small mirrored
+                    dataset in the browser, not a live Node process. It is
+                    designed to explain the hint pipeline without executing
+                    arbitrary code, accessing your filesystem, or making
+                    network requests.</span
                   >
                 </div>
               </li>

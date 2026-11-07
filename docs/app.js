@@ -8,8 +8,8 @@
   /* ------------------------------------------------------------------
    * Shared hint data
    * Mirrors the real, ordered `hints` array in src/hints.js. Used by both
-   * the Error Gallery section and the "try it" playground below it, so the
-   * two are guaranteed to show the same thing. If src/hints.js changes,
+   * the Error Gallery section and the standalone playground page, so the two
+   * are guaranteed to show the same thing. If src/hints.js changes,
    * update this array to match — it is not a live import of the package.
    * ------------------------------------------------------------------ */
   var HINTS_DATA = [
@@ -90,7 +90,11 @@
           hint: "'fetch' is not available in older versions of Node.js (below v18).\nIf you're on Node 18+, make sure you're not in a context where it's unavailable.\nOtherwise, install a polyfill like node-fetch: npm install node-fetch.",
         },
         {
-          match: "myVariable is not defined",
+          match: "require is not defined",
+          hint: 'You\'re using require() inside an ES module.\nYour package.json likely has "type": "module" set.\nEither switch to import syntax, or rename the file to .cjs.',
+        },
+        {
+          match: "is not defined",
           hint: "You're using a variable or function that hasn't been declared yet.\nCheck for typos in the name, make sure it's in scope, and that the\nfile or module it lives in has been imported correctly.",
         },
       ],
@@ -117,10 +121,6 @@
         {
           match: "Cannot use import statement outside a module",
           hint: 'You\'re using ES module syntax (import/export) but Node is treating your file as CommonJS.\nEither rename the file to .mjs, add "type": "module" to your package.json,\nor switch to CommonJS syntax: const x = require(\'x\').',
-        },
-        {
-          match: "require is not defined",
-          hint: 'You\'re using require() inside an ES module.\nYour package.json likely has "type": "module" set.\nEither switch to import syntax, or rename the file to .cjs.',
         },
       ],
     },
@@ -206,7 +206,7 @@
           hint: "The address you're trying to bind to isn't available on this machine.\nThis usually means you're trying to listen on a specific IP that doesn't exist on this system.\nTry using 0.0.0.0 or localhost instead.",
         },
         {
-          match: "MODULE_NOT_FOUND",
+          match: "Cannot find module",
           hint: "Node can't find the module you're trying to import.\nCheck that the package is installed (npm install <package>), the name is spelled\ncorrectly, and the file path is right if it's a local module.",
         },
       ],
@@ -245,38 +245,93 @@
   var GENERIC_FALLBACK =
     'Double-check the line where this occurred and inspect the values involved\nwith console.log. The error type "Error" usually means something\nisn\'t what you expected it to be at that point in the code.';
 
+  var PLAYGROUND_SCENARIOS = [
+    {
+      id: "undefined-property",
+      label: "TypeError — undefined property",
+      code: "const user = undefined;\nconsole.log(user.name);",
+      marker: "user.name",
+      error: {
+        type: "TypeError",
+        message: "Cannot read properties of undefined (reading 'name')",
+        file: "example.js",
+        line: 2,
+      },
+    },
+    {
+      id: "missing-file",
+      label: "ENOENT — missing file",
+      code: 'const fs = require("node:fs");\nfs.readFileSync("missing.txt");',
+      marker: "missing.txt",
+      error: {
+        type: "Error",
+        message: "ENOENT: no such file or directory, open 'missing.txt'",
+        file: "example.js",
+        line: 2,
+      },
+    },
+    {
+      id: "promise-rejection",
+      label: "Promise — unhandled rejection",
+      code: 'Promise.reject(new Error("database unavailable"));',
+      marker: "database unavailable",
+      error: {
+        type: "Error",
+        message: "database unavailable",
+        file: "example.js",
+        line: 1,
+      },
+    },
+    {
+      id: "generic-error",
+      label: "Error — generic fallback",
+      code: 'throw new Error("something unexpected happened");',
+      marker: "something unexpected happened",
+      error: {
+        type: "Error",
+        message: "something unexpected happened",
+        file: "example.js",
+        line: 1,
+      },
+    },
+  ];
+
   /* ------------------------------ theme ------------------------------ */
   var root = document.documentElement;
   var themeToggle = document.getElementById("themeToggle");
-  themeToggle.addEventListener("click", function () {
-    var current = root.getAttribute("data-theme");
-    var next = current === "light" ? "dark" : "light";
-    root.setAttribute("data-theme", next);
-    localStorage.setItem("hint-errors-theme", next);
-  });
+  if (themeToggle) {
+    themeToggle.addEventListener("click", function () {
+      var current = root.getAttribute("data-theme");
+      var next = current === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      localStorage.setItem("hint-errors-theme", next);
+    });
+  }
 
   /* --------------------------- mobile sidebar ------------------------- */
   var sidebar = document.getElementById("sidebar");
   var menuToggle = document.getElementById("menuToggle");
   var scrim = document.getElementById("sidebarScrim");
 
-  function openSidebar() {
-    sidebar.classList.add("open");
-    scrim.classList.add("show");
-    menuToggle.setAttribute("aria-expanded", "true");
+  if (sidebar && menuToggle && scrim) {
+    function openSidebar() {
+      sidebar.classList.add("open");
+      scrim.classList.add("show");
+      menuToggle.setAttribute("aria-expanded", "true");
+    }
+    function closeSidebar() {
+      sidebar.classList.remove("open");
+      scrim.classList.remove("show");
+      menuToggle.setAttribute("aria-expanded", "false");
+    }
+    menuToggle.addEventListener("click", function () {
+      sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
+    });
+    scrim.addEventListener("click", closeSidebar);
+    sidebar.querySelectorAll("a[data-nav]").forEach(function (a) {
+      a.addEventListener("click", closeSidebar);
+    });
   }
-  function closeSidebar() {
-    sidebar.classList.remove("open");
-    scrim.classList.remove("show");
-    menuToggle.setAttribute("aria-expanded", "false");
-  }
-  menuToggle.addEventListener("click", function () {
-    sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
-  });
-  scrim.addEventListener("click", closeSidebar);
-  sidebar.querySelectorAll("a[data-nav]").forEach(function (a) {
-    a.addEventListener("click", closeSidebar);
-  });
 
   /* ------------------------ active section tracking -------------------- */
   var navLinks = Array.prototype.slice.call(
@@ -581,112 +636,208 @@
     });
   }
 
-  var totalEntries = 0;
-  HINTS_DATA.forEach(function (group) {
-    var section = document.createElement("div");
-    section.className = "category-group";
-    section.setAttribute("data-category", group.category);
+  if (galleryRoot && galleryMeta && galleryEmpty && galleryFilter) {
+    var totalEntries = 0;
+    HINTS_DATA.forEach(function (group) {
+      var section = document.createElement("div");
+      section.className = "category-group";
+      section.setAttribute("data-category", group.category);
 
-    var heading = document.createElement("h3");
-    heading.textContent = group.category;
-    section.appendChild(heading);
+      var heading = document.createElement("h3");
+      heading.textContent = group.category;
+      section.appendChild(heading);
 
-    var grid = document.createElement("div");
-    grid.className = "gallery-grid";
+      var grid = document.createElement("div");
+      grid.className = "gallery-grid";
 
-    group.entries.forEach(function (entry) {
-      totalEntries++;
-      var card = document.createElement("div");
-      card.className = "gallery-card";
-      card.setAttribute(
-        "data-search",
-        (entry.match + " " + entry.hint).toLowerCase(),
-      );
-      card.innerHTML =
-        '<div class="g-match">' +
-        escapeHtml(entry.match) +
-        "</div>" +
-        '<div class="g-hint">' +
-        escapeHtml(entry.hint) +
-        "</div>";
-      grid.appendChild(card);
-    });
-
-    section.appendChild(grid);
-    galleryRoot.appendChild(section);
-  });
-
-  galleryMeta.textContent = totalEntries + " shown of 40+ total patterns.";
-
-  galleryFilter.addEventListener("input", function () {
-    var q = galleryFilter.value.trim().toLowerCase();
-    var visibleCount = 0;
-    galleryRoot.querySelectorAll(".category-group").forEach(function (group) {
-      var groupHasVisible = false;
-      group.querySelectorAll(".gallery-card").forEach(function (card) {
-        var match = !q || card.getAttribute("data-search").indexOf(q) !== -1;
-        card.classList.toggle("hidden", !match);
-        if (match) {
-          groupHasVisible = true;
-          visibleCount++;
-        }
+      group.entries.forEach(function (entry) {
+        totalEntries++;
+        var card = document.createElement("div");
+        card.className = "gallery-card";
+        card.setAttribute(
+          "data-search",
+          (entry.match + " " + entry.hint).toLowerCase(),
+        );
+        card.innerHTML =
+          '<div class="g-match">' +
+          escapeHtml(entry.match) +
+          "</div>" +
+          '<div class="g-hint">' +
+          escapeHtml(entry.hint) +
+          "</div>";
+        grid.appendChild(card);
       });
-      group.style.display = groupHasVisible ? "" : "none";
+
+      section.appendChild(grid);
+      galleryRoot.appendChild(section);
     });
-    galleryEmpty.classList.toggle("show", visibleCount === 0);
-    galleryMeta.textContent = q
-      ? visibleCount +
-        " matching " +
-        (visibleCount === 1 ? "pattern" : "patterns")
-      : totalEntries + " shown of 40+ total patterns.";
-  });
+
+    galleryMeta.textContent = totalEntries + " shown of 40+ total patterns.";
+
+    galleryFilter.addEventListener("input", function () {
+      var q = galleryFilter.value.trim().toLowerCase();
+      var visibleCount = 0;
+      galleryRoot.querySelectorAll(".category-group").forEach(function (group) {
+        var groupHasVisible = false;
+        group.querySelectorAll(".gallery-card").forEach(function (card) {
+          var match = !q || card.getAttribute("data-search").indexOf(q) !== -1;
+          card.classList.toggle("hidden", !match);
+          if (match) {
+            groupHasVisible = true;
+            visibleCount++;
+          }
+        });
+        group.style.display = groupHasVisible ? "" : "none";
+      });
+      galleryEmpty.classList.toggle("show", visibleCount === 0);
+      galleryMeta.textContent = q
+        ? visibleCount +
+          " matching " +
+          (visibleCount === 1 ? "pattern" : "patterns")
+        : totalEntries + " shown of 40+ total patterns.";
+    });
+  }
 
   /* ----------------------------- playground ------------------------------ */
-  var pgInput = document.getElementById("pgInput");
+  var pgScenario = document.getElementById("pgScenario");
+  var pgCode = document.getElementById("pgCode");
+  var pgLineNumbers = document.getElementById("pgLineNumbers");
+  var pgRun = document.getElementById("pgRun");
+  var pgReset = document.getElementById("pgReset");
+  var pgRawResult = document.getElementById("pgRawResult");
   var pgResult = document.getElementById("pgResult");
-  var allEntries = HINTS_DATA.reduce(function (acc, g) {
-    return acc.concat(g.entries);
-  }, []);
+  var pgStatus = document.getElementById("pgStatus");
 
-  function findHint(message) {
-    var lower = message.toLowerCase();
-    for (var i = 0; i < allEntries.length; i++) {
-      if (
-        lower.indexOf(allEntries[i].match.toLowerCase().split(":")[0]) !== -1
-      ) {
-        return allEntries[i].hint;
+  if (
+    pgScenario &&
+    pgCode &&
+    pgLineNumbers &&
+    pgRun &&
+    pgReset &&
+    pgRawResult &&
+    pgResult &&
+    pgStatus
+  ) {
+    PLAYGROUND_SCENARIOS.forEach(function (scenario) {
+    var option = document.createElement("option");
+    option.value = scenario.id;
+    option.textContent = scenario.label;
+    pgScenario.appendChild(option);
+    });
+
+  function getSelectedScenario() {
+    for (var i = 0; i < PLAYGROUND_SCENARIOS.length; i++) {
+      if (PLAYGROUND_SCENARIOS[i].id === pgScenario.value) {
+        return PLAYGROUND_SCENARIOS[i];
+      }
+    }
+    return PLAYGROUND_SCENARIOS[0];
+  }
+
+  function findHint(error) {
+    var combined = error.type + ": " + error.message;
+    for (var i = 0; i < HINTS_DATA.length; i++) {
+      var entries = HINTS_DATA[i].entries;
+      for (var j = 0; j < entries.length; j++) {
+        if (combined.indexOf(entries[j].match) !== -1) {
+          return entries[j].hint;
+        }
       }
     }
     return GENERIC_FALLBACK;
   }
 
-  function renderPlayground() {
-    var message = pgInput.value.trim() || "some exotic thing went sideways";
-    var hint = findHint(message);
+  function inferPlaygroundError(source) {
+    for (var i = 0; i < PLAYGROUND_SCENARIOS.length; i++) {
+      var scenario = PLAYGROUND_SCENARIOS[i];
+      if (source.indexOf(scenario.marker) !== -1) {
+        return scenario.error;
+      }
+    }
+
+    var firstCodeLine = source.split(/\r?\n/).findIndex(function (line) {
+      return line.trim().length > 0;
+    });
+    return {
+      type: "Error",
+      message:
+        "No supported scenario matched. Edited source: " +
+        (source.trim() || "(empty)"),
+      file: "example.js",
+      line: firstCodeLine === -1 ? 1 : firstCodeLine + 1,
+    };
+  }
+
+  function updateLineNumbers() {
+    var lineCount = Math.max(1, pgCode.value.split(/\r?\n/).length);
+    var lines = [];
+    for (var i = 1; i <= lineCount; i++) lines.push(String(i));
+    pgLineNumbers.textContent = lines.join("\n");
+    pgLineNumbers.scrollTop = pgCode.scrollTop;
+  }
+
+  function formatRawOutput(error, source) {
+    var lines = source.split(/\r?\n/);
+    var lineNumber = Math.max(1, error.line || 1);
+    var sourceLine = lines[lineNumber - 1] || "";
+    var caretColumn = sourceLine.indexOf("(");
+    if (caretColumn < 0) caretColumn = Math.min(sourceLine.length, 12);
+
+    return [
+      error.file + ":" + lineNumber,
+      sourceLine,
+      " ".repeat(caretColumn) + "^",
+      "",
+      error.type + ": " + error.message,
+      "    at Object.<anonymous> (" + error.file + ":" + lineNumber + ":1)",
+      "    at runExample (" + error.file + ":" + lineNumber + ":1)",
+    ].join("\n");
+  }
+
+  function renderPlayground(status) {
+    var source = pgCode.value;
+    var error = inferPlaygroundError(source);
+    var hint = findHint(error);
+    var location = error.file
+      ? error.file + ": line " + error.line
+      : "unknown location";
+    pgRawResult.textContent = formatRawOutput(error, source);
     pgResult.innerHTML =
-      '<div class="term-window"><div class="term-titlebar"><div class="term-dots"><span></span><span></span><span></span></div><span class="term-title">hint-errors</span></div>' +
       '<div class="term-body hint-block"><dl>' +
-      '<dt>error</dt><dd class="v-error">Error</dd>' +
+      '<dt>error</dt><dd class="v-error">' +
+      escapeHtml(error.type) +
+      "</dd>" +
       '<dt>message</dt><dd class="v-message">' +
-      escapeHtml(message) +
+      escapeHtml(error.message) +
+      "</dd>" +
+      '<dt>location</dt><dd class="v-location">' +
+      escapeHtml(location) +
       "</dd>" +
       '<dt>hint</dt><dd class="v-hint">' +
       escapeHtml(hint) +
       "</dd>" +
-      "</dl></div></div>";
+      "</dl></div>";
+    pgStatus.textContent = status || "Ready";
   }
-  pgInput.addEventListener("input", debounce(renderPlayground, 150));
-  renderPlayground();
 
-  function debounce(fn, wait) {
-    var t;
-    return function () {
-      clearTimeout(t);
-      var args = arguments,
-        ctx = this;
-      t = setTimeout(function () {
-        fn.apply(ctx, args);
-      }, wait);
-    };
+  function loadSelectedScenario() {
+    var scenario = getSelectedScenario();
+    pgCode.value = scenario.code;
+    updateLineNumbers();
+    renderPlayground("Ready");
+  }
+
+    pgScenario.addEventListener("change", loadSelectedScenario);
+    pgRun.addEventListener("click", function () {
+      updateLineNumbers();
+      renderPlayground("Ran");
+    });
+    pgReset.addEventListener("click", loadSelectedScenario);
+    pgCode.addEventListener("input", updateLineNumbers);
+    pgCode.addEventListener("scroll", function () {
+      pgLineNumbers.scrollTop = pgCode.scrollTop;
+    });
+    pgScenario.selectedIndex = 0;
+    loadSelectedScenario();
   }
 })();
