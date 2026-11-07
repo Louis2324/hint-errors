@@ -42,10 +42,13 @@ const NATURAL_SCENARIOS = [
       "require(process.env.HINT_ENTRY);\n" +
       "const user = undefined;\n" +
       "console.log(user.name);\n",
-    stdoutIncludes: [
-      "Cannot read properties of undefined",
-      "You're trying to access a property",
+    stdoutIncludesAny: [
+      [
+        "Cannot read properties of undefined",
+        "Cannot read property 'name' of undefined",
+      ],
     ],
+    stdoutIncludes: ["You're trying to access a property"],
   },
   {
     id: "natural-unhandled-rejection",

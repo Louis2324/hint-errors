@@ -107,6 +107,12 @@ test("sandbox natural process cases preserve runtime behavior", () => {
     for (const text of scenario.stdoutIncludes || []) {
       assert.ok(result.stdout.includes(text), `${scenario.id}: missing stdout ${text}`);
     }
+    for (const alternatives of scenario.stdoutIncludesAny || []) {
+      assert.ok(
+        alternatives.some((text) => result.stdout.includes(text)),
+        `${scenario.id}: missing one of stdout ${alternatives.join(" / ")}`,
+      );
+    }
     for (const text of scenario.stdoutExcludes || []) {
       assert.ok(!result.stdout.includes(text), `${scenario.id}: unexpected stdout ${text}`);
     }
