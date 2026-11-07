@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ZLouisMiguel/hint-errors/actions/workflows/ci.yml"><img src="https://github.com/ZLouisMiguel/hint-errors/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/Louis2324/hint-errors/actions/workflows/ci.yml"><img src="https://github.com/Louis2324/hint-errors/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
 </p>
 
 <p align="center">
-  <a href="https://zlouismiguel.github.io/hint-errors/"><strong>Try the interactive demo →</strong></a>
+  <a href="https://louis2324.github.io/hint-errors/"><strong>Try the interactive demo →</strong></a>
 </p>
 
 ## Install
@@ -209,7 +209,7 @@ normalized back to a plain filesystem path for display.
 
 ## Maintainers
 
-- [@ZLouisMiguel](https://github.com/ZLouisMiguel)
+- [@Louis2324](https://github.com/Louis2324)
 - [@Kennedy](https://github.com/kawacukennedy)
 
 ## License

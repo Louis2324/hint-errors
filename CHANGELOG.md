@@ -11,6 +11,14 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.2] - 2026-11-07
+
+### Documentation
+
+- Updated repository, issue tracker, maintainer, and release links for the
+  move to `Louis2324/hint-errors`.
+- Updated the interactive demo URL to `https://louis2324.github.io/hint-errors/`.
+
 ## [1.3.1] - 2026-09-19
 
 ### Fixed
@@ -182,10 +190,10 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Full JSDoc documentation across all source files
 - Windows-compatible path handling in `formatter.js`
 
-[1.3.1]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.3.1
-[1.3.0]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.3.0
-[1.2.0]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.2.0
-[1.1.3]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.1.3
-[1.1.2]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.1.2
-[1.1.0]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.1.0
-[1.0.0]: https://github.com/ZLouisMiguel/hint-errors/releases/tag/v1.0.0
+[1.3.1]: https://github.com/Louis2324/hint-errors/releases/tag/v1.3.1
+[1.3.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.3.0
+[1.2.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.2.0
+[1.1.3]: https://github.com/Louis2324/hint-errors/releases/tag/v1.1.3
+[1.1.2]: https://github.com/Louis2324/hint-errors/releases/tag/v1.1.2
+[1.1.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.1.0
+[1.0.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.0.0

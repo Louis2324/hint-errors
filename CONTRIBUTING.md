@@ -5,7 +5,7 @@ Thanks for helping make error messages suck less.
 ## Getting started
 
 ```bash
-git clone https://github.com/ZLouisMiguel/hint-errors.git
+git clone https://github.com/Louis2324/hint-errors.git
 cd hint-errors
 npm install
 ```
@@ -112,4 +112,4 @@ Manually verify the correct hint appears for a quick check while writing it.
 
 ## Questions?
 
-Open an issue or tag [@ZLouisMiguel](https://github.com/ZLouisMiguel) or any other listed maintainer.
+Open an issue or tag [@Louis2324](https://github.com/Louis2324) or any other listed maintainer.
