@@ -21,6 +21,10 @@
           hint: "You're trying to access a property on something that doesn't exist yet.\nCheck that the value is defined before you use it — a quick console.log\njust above the error line will show you what it actually is.",
         },
         {
+          match: "Cannot read property",
+          hint: "You're trying to access a property on a value that isn't defined yet.\nOlder Node versions use this singular error wording; a quick console.log\njust above the error line will show you what it actually is.",
+        },
+        {
           match: "Cannot read properties of null",
           hint: "The value you're reading from is null, not just undefined.\nThis usually means something that was supposed to return data returned null instead.\nCheck where that value comes from and whether it can ever be null.",
         },
