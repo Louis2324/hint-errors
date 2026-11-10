@@ -61,6 +61,10 @@
           hint: "You're trying to modify a property that has been marked as read-only.\nThis can happen with frozen objects (Object.freeze), constants, or\nproperties defined with writable: false via Object.defineProperty.",
         },
         {
+          match: "Assignment to constant variable",
+          hint: "You're trying to reassign a variable declared with const.\nUse let if the value needs to change, or keep const and update the object's\nproperties instead of replacing the binding.",
+        },
+        {
           match: "Right-hand side of 'instanceof' is not callable",
           hint: "The value on the right of instanceof isn't a constructor or class.\nIt's likely undefined or was never exported/imported correctly.\nCheck your imports at the top of the file.",
         },
@@ -250,6 +254,18 @@
     'Double-check the line where this occurred and inspect the values involved\nwith console.log. The error type "Error" usually means something\nisn\'t what you expected it to be at that point in the code.';
 
   var PLAYGROUND_SCENARIOS = [
+    {
+      id: "constant-reassignment",
+      label: "TypeError — constant reassignment",
+      code: "const number = 10;\nnumber = 15;\nconsole.log(number);",
+      marker: "number = 15",
+      error: {
+        type: "TypeError",
+        message: "Assignment to constant variable.",
+        file: "example.js",
+        line: 2,
+      },
+    },
     {
       id: "undefined-property",
       label: "TypeError — undefined property",

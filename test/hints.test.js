@@ -25,6 +25,15 @@ test("returns a specific hint for null property reads", () => {
   );
 });
 
+test("returns a specific hint for constant reassignment", () => {
+  const hint = getHint({
+    type: "TypeError",
+    message: "Assignment to constant variable.",
+  });
+  assert.ok(/const|reassign/i.test(hint));
+  assert.ok(/let/i.test(hint));
+});
+
 test("returns a specific hint for non-function calls", () => {
   const hint = getHint({
     type: "TypeError",

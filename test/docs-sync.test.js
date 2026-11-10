@@ -11,16 +11,16 @@ const docsPath = path.join(rootDir, "docs", "app.js");
 
 // Loads the private `hints` array from src/hints.js by evaluating the module
 // in a sandbox, since it is not part of the public exports (getHint/addHint).
-function loadSrcHintTexts() {
+function loadSrcHints() {
   const source = fs.readFileSync(srcPath, "utf8");
   const sandbox = { console, module: { exports: {} }, exports: {} };
   vm.runInNewContext(source + "\n;this.__hints = hints;", sandbox);
-  return sandbox.__hints.map((entry) => entry.hint);
+  return sandbox.__hints;
 }
 
 // Pulls the HINTS_DATA array literal out of docs/app.js and evaluates just
 // that literal (it is plain data — no DOM, globals, or side effects).
-function loadDocsHintTexts() {
+function loadDocsEntries() {
   const source = fs.readFileSync(docsPath, "utf8");
   const marker = "var HINTS_DATA = ";
   const start = source.indexOf(marker);
@@ -33,14 +33,18 @@ function loadDocsHintTexts() {
   assert.notStrictEqual(end, -1, "HINTS_DATA literal should be closed with ];");
   const literal = source.slice(start + marker.length, end + 1);
   const data = vm.runInNewContext(literal);
-  return data.reduce((acc, group) => acc.concat(group.entries), []).map(
-    (entry) => entry.hint,
+  return data.reduce(
+    (acc, group) =>
+      acc.concat(group.entries.map((entry) => ({ ...entry, category: group.category }))),
+    [],
   );
 }
 
 test("docs/app.js HINTS_DATA stays in sync with src/hints.js hints", () => {
-  const srcHints = loadSrcHintTexts();
-  const docsHints = loadDocsHintTexts();
+  const srcEntries = loadSrcHints();
+  const docsEntries = loadDocsEntries();
+  const srcHints = srcEntries.map((entry) => entry.hint);
+  const docsHints = docsEntries.map((entry) => entry.hint);
 
   const assertMultiset = (a, b, labelA, labelB) => {
     const counts = new Map();
@@ -86,8 +90,29 @@ test("docs/app.js HINTS_DATA stays in sync with src/hints.js hints", () => {
   );
 });
 
+test("docs gallery examples are matched by their real source rules", () => {
+  const srcEntries = loadSrcHints();
+  const docsEntries = loadDocsEntries();
+  const sourceByHint = new Map(srcEntries.map((entry) => [entry.hint, entry]));
+
+  for (const docEntry of docsEntries) {
+    const sourceEntry = sourceByHint.get(docEntry.hint);
+    assert.ok(sourceEntry, `missing source rule for ${docEntry.match}`);
+
+    const sourceMatch = sourceEntry.match;
+    const matches =
+      typeof sourceMatch === "string"
+        ? docEntry.match.includes(sourceMatch)
+        : new RegExp(sourceMatch.source, sourceMatch.flags).test(docEntry.match);
+    assert.ok(
+      matches,
+      `docs example ${JSON.stringify(docEntry.match)} does not match its source rule ${String(sourceMatch)}`,
+    );
+  }
+});
+
 test("docs/app.js HINTS_DATA has no duplicate entries", () => {
-  const docsHints = loadDocsHintTexts();
+  const docsHints = loadDocsEntries().map((entry) => entry.hint);
   const seen = new Set();
   const duplicates = [];
   for (const hint of docsHints) {

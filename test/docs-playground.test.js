@@ -89,6 +89,11 @@ test("playground scenarios have the required editable error shape", () => {
     assert.ok(!ids.has(scenario.id), `duplicate playground scenario: ${scenario.id}`);
     ids.add(scenario.id);
   }
+  const constantScenario = scenarios.find(
+    (scenario) => scenario.id === "constant-reassignment",
+  );
+  assert.ok(constantScenario, "constant reassignment should be a playground scenario");
+  assert.strictEqual(constantScenario.error.message, "Assignment to constant variable.");
 });
 
 test("playground source retains safe escaping and ordered hint lookup", () => {

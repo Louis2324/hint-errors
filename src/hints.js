@@ -88,6 +88,12 @@ This can happen with frozen objects (Object.freeze), constants, or
 properties defined with writable: false via Object.defineProperty.`,
   },
   {
+    match: "Assignment to constant variable",
+    hint: `You're trying to reassign a variable declared with const.
+Use let if the value needs to change, or keep const and update the object's
+properties instead of replacing the binding.`,
+  },
+  {
     match: "Right-hand side of 'instanceof' is not callable",
     hint: `The value on the right of instanceof isn't a constructor or class.
 It's likely undefined or was never exported/imported correctly.
