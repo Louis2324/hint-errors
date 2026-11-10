@@ -705,6 +705,7 @@
   /* ----------------------------- playground ------------------------------ */
   var pgScenario = document.getElementById("pgScenario");
   var pgCode = document.getElementById("pgCode");
+  var pgCodeHighlight = document.getElementById("pgCodeHighlight");
   var pgLineNumbers = document.getElementById("pgLineNumbers");
   var pgRun = document.getElementById("pgRun");
   var pgReset = document.getElementById("pgReset");
@@ -715,6 +716,7 @@
   if (
     pgScenario &&
     pgCode &&
+    pgCodeHighlight &&
     pgLineNumbers &&
     pgRun &&
     pgReset &&
@@ -777,7 +779,44 @@
     var lines = [];
     for (var i = 1; i <= lineCount; i++) lines.push(String(i));
     pgLineNumbers.textContent = lines.join("\n");
+    updateCodeHighlight();
+    syncCodeScroll();
+  }
+
+  function highlightCode(source) {
+    var tokenPattern = /(\/\/[^\r\n]*|\/\*[\s\S]*?\*\/|'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|\b(?:const|let|var|function|return|throw|new|if|else|for|while|async|await|import|from|export|class|extends|require)\b|\b\d+(?:\.\d+)?\b)/g;
+    var keywords = /^(?:const|let|var|function|return|throw|new|if|else|for|while|async|await|import|from|export|class|extends|require)$/;
+    var result = [];
+    var lastIndex = 0;
+    var match;
+
+    while ((match = tokenPattern.exec(source))) {
+      result.push(escapeHtml(source.slice(lastIndex, match.index)));
+      var token = match[0];
+      var className = "tok-number";
+      if (/^\/\//.test(token) || /^\/\*/.test(token)) {
+        className = "tok-comment";
+      } else if (/^[\'"`]/.test(token)) {
+        className = "tok-string";
+      } else if (keywords.test(token)) {
+        className = "tok-keyword";
+      }
+      result.push('<span class="' + className + '">' + escapeHtml(token) + "</span>");
+      lastIndex = tokenPattern.lastIndex;
+    }
+
+    result.push(escapeHtml(source.slice(lastIndex)));
+    pgCodeHighlight.innerHTML = result.join("") || " ";
+  }
+
+  function updateCodeHighlight() {
+    highlightCode(pgCode.value);
+  }
+
+  function syncCodeScroll() {
     pgLineNumbers.scrollTop = pgCode.scrollTop;
+    pgCodeHighlight.scrollTop = pgCode.scrollTop;
+    pgCodeHighlight.scrollLeft = pgCode.scrollLeft;
   }
 
   function formatRawOutput(error, source) {
@@ -838,9 +877,7 @@
     });
     pgReset.addEventListener("click", loadSelectedScenario);
     pgCode.addEventListener("input", updateLineNumbers);
-    pgCode.addEventListener("scroll", function () {
-      pgLineNumbers.scrollTop = pgCode.scrollTop;
-    });
+    pgCode.addEventListener("scroll", syncCodeScroll);
     pgScenario.selectedIndex = 0;
     loadSelectedScenario();
   }

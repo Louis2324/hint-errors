@@ -119,13 +119,16 @@
             </div>
             <div class="pg-editor-shell">
               <pre class="pg-line-numbers" id="pgLineNumbers" aria-hidden="true">1</pre>
-              <textarea
-                id="pgCode"
-                class="pg-code"
-                aria-label="Editable Node.js example"
-                spellcheck="false"
-                wrap="off"
-              ></textarea>
+              <div class="pg-code-wrap">
+                <pre class="pg-code-highlight" id="pgCodeHighlight" aria-hidden="true"></pre>
+                <textarea
+                  id="pgCode"
+                  class="pg-code"
+                  aria-label="Editable Node.js example"
+                  spellcheck="false"
+                  wrap="off"
+                ></textarea>
+              </div>
             </div>
           </section>
 

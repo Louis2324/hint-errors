@@ -43,6 +43,7 @@ test("standalone playground exposes the editor and output contract", () => {
     "pgRun",
     "pgReset",
     "pgLineNumbers",
+    "pgCodeHighlight",
     "pgRawResult",
     "pgResult",
   ]) {
