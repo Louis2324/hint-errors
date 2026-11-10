@@ -183,6 +183,21 @@ function formatErrorSync(parsed, hint) {
     return;
   }
 
+  // POSIX Node 22+ may expose stdout pipes as non-blocking descriptors. A
+  // large fatal diagnostic can then stop at the pipe capacity with EAGAIN
+  // before a parent process has drained it. Make the descriptor blocking for
+  // this synchronous fatal-path write so the loop can finish before another
+  // listener or process.exit() terminates the process.
+  const streamHandle = stdout._handle;
+  if (streamHandle && typeof streamHandle.setBlocking === "function") {
+    try {
+      streamHandle.setBlocking(true);
+    } catch (_error) {
+      // Fall back to the existing write loop when the stream does not allow
+      // changing its blocking mode.
+    }
+  }
+
   let offset = 0;
 
   try {
