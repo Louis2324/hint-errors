@@ -28,10 +28,24 @@ function loadScenarioData() {
 
 test("docs gallery links to a standalone playground after the gallery", () => {
   const galleryEnd = html.indexOf('id="galleryEmpty"');
-  const playgroundLink = html.indexOf('href="playground.html"');
+  const playgroundLink = html.indexOf(
+    'class="btn btn-primary" href="playground.html"',
+  );
   assert.notStrictEqual(galleryEnd, -1);
   assert.ok(playgroundLink > galleryEnd, "playground CTA should follow the gallery");
   assert.match(html, /Try it yourself/i);
+  assert.match(html, /<a href="playground\.html">Try it yourself<\/a>/);
+  assert.match(html, /class="sidebar-cta" href="playground\.html"/);
+  assert.ok(
+    html.indexOf('href="#errors" data-nav') <
+      html.indexOf('class="sidebar-cta"'),
+    "playground route should sit after Error Gallery in the docs sidebar",
+  );
+  assert.ok(
+    html.indexOf('class="sidebar-cta"') <
+      html.indexOf('href="#production" data-nav'),
+    "playground route should sit before Production Safety in the docs sidebar",
+  );
   assert.doesNotMatch(html, /id="pgCode"/);
   assert.doesNotMatch(html, /Interactive playground/);
 });
@@ -52,6 +66,7 @@ test("standalone playground exposes the editor and output contract", () => {
   assert.match(playgroundHtml, /aria-live="polite"/);
   assert.match(playgroundHtml, /safe browser simulation/i);
   assert.match(playgroundHtml, /Try it yourself/i);
+  assert.match(playgroundHtml, /href="playground\.html" aria-current="page"/);
   assert.match(playgroundHtml, /raw Node\.js output/i);
   assert.match(playgroundHtml, /before hint-errors/i);
   assert.match(playgroundHtml, /hint-errors output/i);

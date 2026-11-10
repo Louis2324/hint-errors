@@ -66,6 +66,15 @@
   --term-bold: var(--brand-white);
   --term-green: var(--brand-green);
 
+  /* Playground editor tokens. These stay bright against the terminal surface
+     in both site themes so code remains readable when the chrome changes. */
+  --code-text: #f1eee5;
+  --code-line: #aaa497;
+  --code-keyword: #ffd166;
+  --code-string: #a8e063;
+  --code-comment: #aab4c3;
+  --code-number: #e2a8ff;
+
   /* radii / motion */
   --radius: 5px;
   --radius-lg: 8px;
@@ -203,9 +212,12 @@ pre,
   justify-content: space-between;
   gap: 1rem;
   padding: 0.75rem 1.25rem;
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  backdrop-filter: blur(10px) saturate(1.1);
+  /* Keep the sticky header opaque: content should never show through it while
+     scrolling, especially when the light theme is active. */
+  background: var(--bg);
+  backdrop-filter: none;
   border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
 }
 .brand {
   display: flex;
@@ -253,6 +265,11 @@ pre,
 .nav-links a:focus-visible {
   color: var(--text);
   border-color: var(--border-strong);
+}
+.nav-links a[aria-current="page"] {
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
 }
 .nav-links a.gh {
   color: var(--text);
@@ -614,6 +631,23 @@ pre,
   width: 2px;
   height: 60%;
   transform: translateY(-50%);
+}
+.sidebar a.sidebar-cta {
+  margin: 0.45rem 0;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  color: var(--accent);
+  border: 1px solid var(--border-strong);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  font-weight: 600;
+}
+.sidebar a.sidebar-cta:hover,
+.sidebar a.sidebar-cta:focus-visible {
+  color: var(--accent-strong);
+  border-color: var(--accent);
+  background: var(--bg-hover);
 }
 
 .content {
@@ -1191,13 +1225,18 @@ h4.sub-sub-head {
 }
 .pg-output-stack {
   display: grid;
-  grid-template-rows: minmax(8rem, 0.72fr) minmax(13rem, 1.28fr);
+  /* Keep raw Node output compact so the useful hint stays in view. Long raw
+     traces scroll inside their own pane instead of pushing the hint away. */
+  grid-template-rows: 8.5rem minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
   border-left: 1px solid var(--term-border);
 }
 .pg-output-panel {
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .pg-output-panel + .pg-output-panel {
   border-top: 1px solid var(--term-border);
@@ -1234,14 +1273,16 @@ h4.sub-sub-head {
 .pg-code-highlight,
 .pg-code {
   margin: 0;
-  font-family: var(--mono);
-  font-size: 0.83rem;
+  font-family: "Cascadia Code", "JetBrains Mono", var(--mono);
+  font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1.7;
+  letter-spacing: -0.01em;
   tab-size: 2;
 }
 .pg-line-numbers {
   padding: 0 0.8rem 0 0.9rem;
-  color: var(--term-dim);
+  color: var(--code-line);
   text-align: right;
   user-select: none;
   overflow: hidden;
@@ -1265,22 +1306,22 @@ h4.sub-sub-head {
 }
 .pg-code-highlight {
   pointer-events: none;
-  color: var(--term-text);
+  color: var(--code-text);
   background: var(--term-bg);
   overflow: hidden;
 }
 .pg-code-highlight .tok-keyword {
-  color: #d19a66;
+  color: var(--code-keyword);
 }
 .pg-code-highlight .tok-string {
-  color: #98c379;
+  color: var(--code-string);
 }
 .pg-code-highlight .tok-comment {
-  color: #7f848e;
+  color: var(--code-comment);
   font-style: italic;
 }
 .pg-code-highlight .tok-number {
-  color: #c678dd;
+  color: var(--code-number);
 }
 .pg-code {
   resize: vertical;
@@ -1321,7 +1362,7 @@ h4.sub-sub-head {
 }
 .pg-result .term-window {
   height: 100%;
-  min-height: 17rem;
+  min-height: 0;
   border: 0;
   border-radius: 0;
   box-shadow: none;
@@ -1379,6 +1420,7 @@ h4.sub-sub-head {
     grid-template-columns: 1fr;
   }
   .pg-output-stack {
+    grid-template-rows: 9rem minmax(18rem, auto);
     border-top: 1px solid var(--term-border);
     border-left: 0;
   }
