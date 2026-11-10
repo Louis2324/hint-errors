@@ -176,6 +176,19 @@ test("addHint accepts a RegExp match", () => {
   assert.strictEqual(hint, "Matched via a custom RegExp.");
 });
 
+test("addHint handles global RegExp matches consistently", () => {
+  addHint({
+    match: /MyGlobalCustomMarker\d+/g,
+    hint: "Matched via a global custom RegExp.",
+  });
+  const parsed = {
+    type: "Error",
+    message: "MyGlobalCustomMarker123 happened",
+  };
+  assert.strictEqual(getHint(parsed), "Matched via a global custom RegExp.");
+  assert.strictEqual(getHint(parsed), "Matched via a global custom RegExp.");
+});
+
 test("addHint throws when entry is missing", () => {
   assert.throws(() => addHint(), TypeError);
 });

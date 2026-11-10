@@ -190,6 +190,7 @@ versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Full JSDoc documentation across all source files
 - Windows-compatible path handling in `formatter.js`
 
+[1.3.2]: https://github.com/Louis2324/hint-errors/releases/tag/v1.3.2
 [1.3.1]: https://github.com/Louis2324/hint-errors/releases/tag/v1.3.1
 [1.3.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.3.0
 [1.2.0]: https://github.com/Louis2324/hint-errors/releases/tag/v1.2.0

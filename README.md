@@ -119,6 +119,25 @@ If you deliberately want hint-errors active in production, set:
 HINT_ERRORS_FORCE=1
 ```
 
+## Privacy
+
+The npm package has no runtime dependencies, does not make network requests,
+and does not collect telemetry or send error data anywhere. The public demo
+uses a browser-side simulation rather than executing Node.js or sending your
+code, errors, or inputs to an API. The demo page may still load visual assets
+such as web fonts.
+
+## Feedback and contributions
+
+Found an incorrect hint, a missing error pattern, or an installation problem?
+Please use the [issue templates](https://github.com/Louis2324/hint-errors/issues/new/choose)
+so the report includes the details needed to reproduce it. For open-ended
+ideas and project direction, join the
+[GitHub Discussions](https://github.com/Louis2324/hint-errors/discussions).
+
+Please redact API keys, tokens, passwords, private paths, internal hostnames,
+customer data, and proprietary source code before sharing errors or logs.
+
 ## Compatibility with error monitoring tools (Sentry, Winston, APM agents)
 
 Node calls every listener registered on `uncaughtException` and

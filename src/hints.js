@@ -347,7 +347,11 @@ function getHint(parsed) {
 
   const found = hints.find((entry) => {
     if (typeof entry.match === "string") return combined.includes(entry.match);
-    if (entry.match instanceof RegExp) return entry.match.test(combined);
+    if (entry.match instanceof RegExp) {
+      // Clone the expression so global/sticky custom matchers cannot leak
+      // lastIndex state across error lookups.
+      return new RegExp(entry.match.source, entry.match.flags).test(combined);
+    }
     return false;
   });
 
